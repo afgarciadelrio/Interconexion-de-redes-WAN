@@ -143,12 +143,14 @@ sudo usermod -aG ubridge,libvirt,kvm,wireshark $USER && sudo reboot
 
 ## Paso 3 — Configurar GNS3
 
+
 Abrir GNS3 y completar el Setup Wizard:
 
 - Server type: `Local`
 - Host: `127.0.0.1`
 - Port: `3080`
 
+<img width="720" height="533" alt="image" src="https://github.com/user-attachments/assets/4c6140dd-b595-4b58-b6ba-bbf4d201295c" />
 ### Fig. 1 — Configuración del servidor local en GNS3
 
 ```bash
@@ -160,6 +162,7 @@ _Verificar que la API REST responde correctamente._
 ---
 
 ## Paso 4 — Python y entorno virtual
+
 
 ```bash
 sudo apt install python3 python3-pip python3-venv git curl wget -y
@@ -177,6 +180,7 @@ source venv/bin/activate
 pip install requests anthropic mcp telnetlib3 pyyaml fastapi uvicorn websockets httpx
 ```
 
+<img width="675" height="100" alt="image" src="https://github.com/user-attachments/assets/5e3a1636-b091-49c1-a41b-683ab0bed6ab" />
 ### Fig. 2 — Confirmación de la versión de Python
 
 ---
@@ -231,6 +235,7 @@ Backend FastAPI con WebSocket que orquesta:
 
 ## Paso 7 — API Key de Anthropic
 
+
 1. Crear cuenta en:
    - https://console.anthropic.com
 
@@ -239,6 +244,7 @@ Backend FastAPI con WebSocket que orquesta:
 3. Agregar saldo mínimo:
    - `$5 USD` para pruebas
 
+<img width="825" height="231" alt="image" src="https://github.com/user-attachments/assets/453dddb4-2d49-4e49-9610-9ca8e147d29f" />
 ### Fig. 3 — Panel de claves API en Anthropic Console
 
 ```bash
@@ -263,6 +269,7 @@ El script `build_deb.sh` automatiza:
 
 # V. RESULTADOS
 
+
 Las pruebas validaron la automatización de múltiples escenarios:
 
 - Redes LAN
@@ -284,6 +291,8 @@ También se verificó interoperabilidad con:
 - MikroTik
 - pfSense
 
+
+<img width="780" height="766" alt="image" src="https://github.com/user-attachments/assets/ada87244-7d2d-4b49-91ae-a9b606d570e3" />
 ### Fig. 4 — Interfaz web de GNS3 AI Studio
 
 ---
