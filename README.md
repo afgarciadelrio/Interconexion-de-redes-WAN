@@ -48,3 +48,55 @@ Esto limita el aprendizaje rápido y la validación de escenarios.
 
 ## 🧠 Solución
 
+GNS3 AI Studio permite:
+
+- Describir una topología en lenguaje natural  
+- Generar automáticamente la infraestructura  
+- Configurar routers y protocolos  
+- Ejecutar todo en pocos minutos  
+
+---
+
+## 🏗️ Arquitectura
+
+El sistema está basado en cuatro componentes principales:
+
+- **GNS3 REST API** → Gestión de proyectos, nodos y enlaces  
+- **MCP (Model Context Protocol)** → Comunicación entre IA y herramientas  
+- **Anthropic Claude API** → Procesamiento de lenguaje natural  
+- **FastAPI + WebSockets** → Backend en tiempo real  
+
+Los routers se configuran mediante Telnet asíncrono usando `telnetlib3`.
+
+---
+
+## 🔧 Herramientas MCP
+
+El sistema expone 14 herramientas:
+
+- `listar_proyectos`
+- `listar_nodos`
+- `crear_proyecto`
+- `eliminar_proyecto`
+- `agregar_nodo`
+- `conectar_nodos`
+- `iniciar_nodos`
+- `detener_nodos`
+- `configurar_router`
+- `ejecutar_comandos`
+- `crear_lan_simple`
+- `crear_topologia_hub_spoke`
+- `crear_topologia_triangulo`
+- `crear_topologia_lineal`
+
+---
+
+## ⚙️ Instalación
+
+### 1️⃣ Sistema y GNS3
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo add-apt-repository ppa:gns3/ppa
+sudo apt install gns3-gui gns3-server -y
+sudo usermod -aG ubridge,libvirt,kvm,wireshark $USER && sudo reboot
