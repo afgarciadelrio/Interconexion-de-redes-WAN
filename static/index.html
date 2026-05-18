@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GNS3 AI Studio</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1117;
+    --sidebar: #161b22;
+    --card: #21262d;
+    --border: #30363d;
+    --accent: #00d4ff;
+    --accent2: #0096c7;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --user-bg: #1f6feb;
+    --ai-bg: #21262d;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 280px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .logo-text p {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .status-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .status-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot.red { background: var(--red); }
+  .dot.yellow { background: var(--yellow); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .quick-btn {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .quick-btn:hover {
+    background: var(--border);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .quick-btn .icon { font-size: 14px; }
+
+  .version {
+    margin-top: auto;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--sidebar);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .connection-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* CHAT */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-track { background: transparent; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* WELCOME */
+  .welcome {
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .welcome-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .welcome h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .welcome p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .welcome-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0, 212, 255, 0.05);
+  }
+
+  /* MESSAGES */
+  .message {
+    display: flex;
+    gap: 12px;
+    max-width: 800px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; margin-left: auto; }
+  .message.ai { margin-right: auto; }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .message.user .avatar { background: var(--user-bg); }
+  .message.ai .avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+
+  .bubble {
+    max-width: calc(100% - 44px);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+
+  .message.user .bubble {
+    background: var(--user-bg);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message.ai .bubble {
+    background: var(--ai-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  /* TOOL CARDS */
+  .tool-card {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 8px;
+    font-size: 12px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .tool-header {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tool-header.running {
+    background: rgba(210, 153, 34, 0.15);
+    color: var(--yellow);
+    border-bottom: 1px solid rgba(210, 153, 34, 0.3);
+  }
+
+  .tool-header.success {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--green);
+    border-bottom: 1px solid rgba(63, 185, 80, 0.3);
+  }
+
+  .tool-header.error {
+    background: rgba(248, 81, 73, 0.15);
+    color: var(--red);
+    border-bottom: 1px solid rgba(248, 81, 73, 0.3);
+  }
+
+  .tool-body {
+    background: var(--bg);
+    padding: 10px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  /* TYPING */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+
+  .typing span {
+    width: 6px;
+    height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: typing 1s infinite;
+  }
+
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  /* INPUT */
+  .input-area {
+    background: var(--sidebar);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    flex-shrink: 0;
+  }
+
+  .input-container {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: border-color 0.15s;
+  }
+
+  .input-container:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+  }
+
+  textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    max-height: 120px;
+    min-height: 24px;
+    line-height: 1.5;
+  }
+
+  textarea::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .send-btn:hover { background: var(--accent2); color: white; transform: scale(1.05); }
+  .send-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* SCROLLBAR */
+  .tool-body::-webkit-scrollbar { width: 4px; }
+  .tool-body::-webkit-scrollbar-track { background: transparent; }
+  .tool-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🌐</div>
+    <div class="logo-text">
+      <h1>GNS3 AI Studio</h1>
+      <p>Powered by Claude + MCP</p>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-title">Estado del sistema</div>
+    <div class="status-item">
+      <div class="dot yellow" id="dot-gns3"></div>
+      <span id="status-gns3">Conectando a GNS3...</span>
+    </div>
+    <div class="status-item">
+      <div class="dot yellow" id="dot-api"></div>
+      <span id="status-api">Verificando API...</span>
+    </div>
+    <div class="status-item">
+      <div class="dot yellow" id="dot-mcp"></div>
+      <span id="status-mcp">Iniciando MCP...</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">⚡ Acciones rápidas</div>
+    <button class="quick-btn" onclick="sendQuick('Lista todos los proyectos en GNS3')">
+      <span class="icon">📋</span> Listar proyectos
+    </button>
+    <button class="quick-btn" onclick="sendQuick('Crea una LAN llamada Demo-LAN con 4 PCs conectados a un switch')">
+      <span class="icon">🌐</span> Nueva LAN (4 PCs)
+    </button>
+    <button class="quick-btn" onclick="sendQuick('Crea una topología triángulo llamada Lab-OSPF con 3 routers Cisco')">
+      <span class="icon">🔺</span> Triángulo OSPF
+    </button>
+    <button class="quick-btn" onclick="sendQuick('Crea una topología hub-and-spoke llamada WAN-Hub con 3 spokes usando routers Cisco')">
+      <span class="icon">⭐</span> Hub-and-Spoke
+    </button>
+    <button class="quick-btn" onclick="sendQuick('Crea una topología lineal llamada Backbone con 4 routers Cisco en línea')">
+      <span class="icon">➖</span> Topología Lineal
+    </button>
+  </div>
+
+  <div class="version">
+    GNS3 AI Studio v1.0<br>
+    🐺 Powered by Anthropic Claude
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="header">
+    <div>
+      <div class="header-title">Asistente de Redes con IA</div>
+      <div class="header-sub">Describe tu topología en español y la creo automáticamente</div>
+    </div>
+    <div class="connection-badge">
+      <div class="dot yellow" id="dot-ws"></div>
+      <span id="status-ws">Conectando...</span>
+    </div>
+  </header>
+
+  <div class="chat-area" id="chat">
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">🌐</div>
+      <h2>GNS3 AI Studio</h2>
+      <p>
+        Automatiza tus topologías de red con inteligencia artificial.<br>
+        Describe lo que necesitas y lo creo en GNS3 automáticamente.
+      </p>
+      <div class="welcome-chips">
+        <span class="chip" onclick="sendQuick('Lista todos los proyectos en GNS3')">📋 Ver proyectos</span>
+        <span class="chip" onclick="sendQuick('Crea una LAN llamada Mi-LAN con 5 PCs')">🖥️ Crear LAN</span>
+        <span class="chip" onclick="sendQuick('Crea topología triángulo OSPF llamada Lab-OSPF con 3 routers Cisco con IPs 10.0.0.0/30 y OSPF área 0')">🔺 OSPF Triángulo</span>
+        <span class="chip" onclick="sendQuick('Crea hub-and-spoke llamado WAN-Empresa con 4 spokes')">⭐ Hub-and-Spoke</span>
+        <span class="chip" onclick="sendQuick('Crea topología lineal llamada Backbone con 4 routers')">➖ Topología Lineal</span>
+        <span class="chip" onclick="sendQuick('¿Qué puedes hacer?')">❓ ¿Qué puedes hacer?</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-container">
+      <textarea
+        id="input"
+        placeholder="Describe la topología que necesitas... (Ej: crea una LAN con 5 PCs)"
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>▶</button>
+    </div>
+    <div class="input-hint">Presiona <b>Enter</b> para enviar · <b>Shift+Enter</b> para nueva línea</div>
+  </div>
+</main>
+
+<script>
+let ws = null;
+let isTyping = false;
+let currentAiBubble = null;
+
+function updateDot(id, status) {
+  const dot = document.getElementById(id);
+  dot.className = 'dot ' + status;
+}
+
+async function checkStatus() {
+  try {
+    const r = await fetch('/status');
+    const data = await r.json();
+    
+    updateDot('dot-gns3', data.gns3 ? 'green' : 'red');
+    document.getElementById('status-gns3').textContent = data.gns3 
+      ? `GNS3 v${data.version} ✓` : 'GNS3 no disponible';
+    
+    updateDot('dot-api', data.api ? 'green' : 'red');
+    document.getElementById('status-api').textContent = data.api 
+      ? 'API Key configurada ✓' : 'API Key no encontrada';
+  } catch(e) {
+    updateDot('dot-gns3', 'red');
+    document.getElementById('status-gns3').textContent = 'Error de conexión';
+  }
+}
+
+function connectWS() {
+  const wsUrl = `ws://${window.location.host}/ws`;
+  ws = new WebSocket(wsUrl);
+  
+  ws.onopen = () => {
+    updateDot('dot-ws', 'yellow');
+    document.getElementById('status-ws').textContent = 'Iniciando MCP...';
+  };
+  
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    
+    if (msg.type === 'ready') {
+      updateDot('dot-ws', 'green');
+      updateDot('dot-mcp', 'green');
+      document.getElementById('status-ws').textContent = 'Conectado ✓';
+      document.getElementById('status-mcp').textContent = `MCP listo (${msg.tools} herramientas)`;
+      document.getElementById('send-btn').disabled = false;
+    }
+    
+    else if (msg.type === 'text') {
+      if (!currentAiBubble) {
+        removeTyping();
+        currentAiBubble = createAiBubble();
+      }
+      currentAiBubble.innerHTML += formatText(msg.content);
+      scrollToBottom();
+    }
+    
+    else if (msg.type === 'tool_start') {
+      if (!currentAiBubble) {
+        removeTyping();
+        currentAiBubble = createAiBubble();
+      }
+      const card = createToolCard(msg.tool, msg.args, 'running');
+      currentAiBubble.appendChild(card);
+      scrollToBottom();
+    }
+    
+    else if (msg.type === 'tool_result') {
+      const lastCard = document.querySelector('.tool-card:last-of-type .tool-header.running');
+      if (lastCard) {
+        lastCard.className = 'tool-header success';
+        lastCard.innerHTML = `<span>✅</span> ${msg.tool}`;
+      }
+      const lastBody = document.querySelector('.tool-card:last-of-type .tool-body');
+      if (lastBody) lastBody.textContent = msg.result;
+      scrollToBottom();
+    }
+    
+    else if (msg.type === 'tool_error') {
+      const lastCard = document.querySelector('.tool-card:last-of-type .tool-header.running');
+      if (lastCard) {
+        lastCard.className = 'tool-header error';
+        lastCard.innerHTML = `<span>❌</span> ${msg.tool}`;
+      }
+      const lastBody = document.querySelector('.tool-card:last-of-type .tool-body');
+      if (lastBody) lastBody.textContent = msg.error;
+      scrollToBottom();
+    }
+    
+    else if (msg.type === 'done') {
+      isTyping = false;
+      currentAiBubble = null;
+      document.getElementById('send-btn').disabled = false;
+      scrollToBottom();
+    }
+    
+    else if (msg.type === 'error') {
+      removeTyping();
+      addErrorMessage(msg.content);
+      isTyping = false;
+      currentAiBubble = null;
+      document.getElementById('send-btn').disabled = false;
+    }
+  };
+  
+  ws.onclose = () => {
+    updateDot('dot-ws', 'red');
+    updateDot('dot-mcp', 'red');
+    document.getElementById('status-ws').textContent = 'Desconectado';
+    document.getElementById('status-mcp').textContent = 'MCP desconectado';
+    document.getElementById('send-btn').disabled = true;
+    setTimeout(connectWS, 3000);
+  };
+  
+  ws.onerror = () => {
+    updateDot('dot-ws', 'red');
+  };
+}
+
+function createAiBubble() {
+  const chat = document.getElementById('chat');
+  const msg = document.createElement('div');
+  msg.className = 'message ai';
+  msg.innerHTML = `
+    <div class="avatar">🤖</div>
+    <div class="bubble" id="ai-bubble-${Date.now()}"></div>
+  `;
+  chat.appendChild(msg);
+  const bubble = msg.querySelector('.bubble');
+  scrollToBottom();
+  return bubble;
+}
+
+function createToolCard(toolName, args, status) {
+  const card = document.createElement('div');
+  card.className = 'tool-card';
+  
+  const emoji = status === 'running' ? '⚙️' : status === 'success' ? '✅' : '❌';
+  const headerClass = `tool-header ${status}`;
+  
+  const argsStr = typeof args === 'object' ? JSON.stringify(args, null, 2) : String(args);
+  
+  card.innerHTML = `
+    <div class="${headerClass}">
+      <span>${emoji}</span> ${toolName}
+    </div>
+    <div class="tool-body">${argsStr}</div>
+  `;
+  return card;
+}
+
+function addUserMessage(text) {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+  
+  const chat = document.getElementById('chat');
+  const msg = document.createElement('div');
+  msg.className = 'message user';
+  msg.innerHTML = `
+    <div class="avatar">👤</div>
+    <div class="bubble">${escapeHtml(text)}</div>
+  `;
+  chat.appendChild(msg);
+  scrollToBottom();
+}
+
+function addTypingIndicator() {
+  const chat = document.getElementById('chat');
+  const msg = document.createElement('div');
+  msg.className = 'message ai';
+  msg.id = 'typing-indicator';
+  msg.innerHTML = `
+    <div class="avatar">🤖</div>
+    <div class="bubble">
+      <div class="typing">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  `;
+  chat.appendChild(msg);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function addErrorMessage(text) {
+  const chat = document.getElementById('chat');
+  const msg = document.createElement('div');
+  msg.className = 'message ai';
+  msg.innerHTML = `
+    <div class="avatar">🤖</div>
+    <div class="bubble" style="border-color: var(--red);">
+      ❌ <strong>Error:</strong> ${escapeHtml(text)}
+    </div>
+  `;
+  chat.appendChild(msg);
+  scrollToBottom();
+}
+
+function formatText(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.*?)`/g, '<code style="background:var(--bg);padding:2px 5px;border-radius:4px;font-family:monospace">$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
+}
+
+function scrollToBottom() {
+  const chat = document.getElementById('chat');
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text || isTyping || !ws || ws.readyState !== WebSocket.OPEN) return;
+  
+  addUserMessage(text);
+  input.value = '';
+  input.style.height = 'auto';
+  
+  isTyping = true;
+  currentAiBubble = null;
+  document.getElementById('send-btn').disabled = true;
+  addTypingIndicator();
+  
+  ws.send(JSON.stringify({ message: text }));
+}
+
+function sendQuick(text) {
+  const input = document.getElementById('input');
+  input.value = text;
+  autoResize(input);
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// Init
+checkStatus();
+connectWS();
+setInterval(checkStatus, 10000);
+</script>
+</body>
+</html>

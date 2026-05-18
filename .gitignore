@@ -1,0 +1,26 @@
+# Entorno virtual de Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Variables de entorno
+.env
+*.log
+
+# Build outputs
+*.deb
+gns3-build/
+
+# Cache
+.cache/
+.gns3-mcp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
