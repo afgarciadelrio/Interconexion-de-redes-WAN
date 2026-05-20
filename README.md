@@ -265,6 +265,23 @@ source ~/.bashrc
 
 ## Paso 8 — Empaquetado como instalador `.deb`
 
+📥 DESCARGA DIRECTA DEL INSTALADOR:
+https://github.com/afgarciadelrio/Interconexion-de-redes-WAN/releases/download/v1.0.0/gns3-ai-studio_1.0.0_amd64.deb
+ 
+🔧 INSTALA DEPENDENCIAS (1 sola vez):
+sudo apt update
+sudo apt install python3 python3-venv zenity curl -y
+ 
+📦 INSTALA EL PROGRAMA:
+sudo dpkg -i gns3-ai-studio_1.0.0_amd64.deb
+ 
+🚀 ÚSARLO:
+Busca "GNS3 AI Studio" en el menú de aplicaciones de Ubuntu.
+La primera vez te pide tu API Key de Anthropic.
+(consíguela en console.anthropic.com, ~$5 USD)
+ 
+Necesitastener GNS3 corriendo cuando uses la app.
+
 El script `build_deb.sh` automatiza:
 
 - La estructura del paquete Debian
