@@ -105,6 +105,8 @@ La interfaz de usuario sigue un diseño tipo ChatGPT desarrollado en:
 
 ## A. Herramientas MCP
 
+`El MCP fue creado e implementado de forma original, no se encuentra en ningun repositorio publico aparte de este`
+
 Las 14 herramientas expuestas vía JSONSchema cubren:
 
 - `listar_proyectos`
